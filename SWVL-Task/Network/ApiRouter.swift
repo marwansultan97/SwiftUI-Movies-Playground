@@ -14,10 +14,13 @@ enum ApiRequest: URLRequestConvertible {
         static let baseURL = "https://www.flickr.com/services/rest/"
     }
         
+    case empty
     case photos(page: Int, tags: String)
     
     var url: URL {
         switch self {
+        case .empty:
+            return URL(string: "asd")!
         case .photos:
             return URL(string: Constants.baseURL)!
         }
@@ -26,6 +29,10 @@ enum ApiRequest: URLRequestConvertible {
     var method: HTTPMethod {
         switch self {
         case .photos:
+            return .get
+            
+            
+        default:
             return .get
         }
     }
@@ -41,6 +48,9 @@ enum ApiRequest: URLRequestConvertible {
                     "text": tags,
                     "nojsoncallback": 1
             ]
+            
+        default:
+            return [:]
         }
     }
     

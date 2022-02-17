@@ -8,45 +8,49 @@
 import Foundation
 
 
-protocol FilteredMovies {
+protocol FilteredMoviesProtocol {
         
-    func filterMovies(query: String, completionHandler: @escaping(Result<[GroupedMovies], DatabaseError>) -> Void)
+    func filterMovies(movies: [MovieElement], query: String) -> [GroupedMovies]
     
 }
 
-class FilteredMoviesUseCase: FilteredMovies {
+class FilteredMoviesUseCase: FilteredMoviesProtocol {
     
-    private var repo = MoviesRepoImpl()
     
-    func filterMovies(query: String, completionHandler: @escaping (Result<[GroupedMovies], DatabaseError>) -> Void) {
+    func filterMovies(movies: [MovieElement], query: String) -> [GroupedMovies] {
+        var result = [GroupedMovies]()
         
-        repo.getMovies { [weak self] response in
-            guard let self = self else { return }
-            switch response {
-            case .success(let movies):
-                completionHandler(.success(self.filterProcess(query: query, movies: movies.movies)))
-            case .failure(let error):
-                completionHandler(.failure(error))
-            }
-        }
+        let dictionary = searchAndGroupByYear(movies: movies, query: query)
         
+        result = sortFirstFiveMovies(dict: dictionary)
+        
+        return result
+    }
+    
+    func searchAndGroupByYear(movies: [MovieElement], query: String) -> Dictionary<Int, [MovieElement]> {
+        var dictionary = Dictionary<Int, [MovieElement]>()
+        
+        let searchedArray = movies.filter { $0.title.lowercased().contains(query) }
+        dictionary = Dictionary(grouping: searchedArray, by: \.year)
+        
+        return dictionary
     }
     
     
-    private func filterProcess(query: String, movies: [MovieElement]) -> [GroupedMovies]  {
-        let searchedArray = movies.filter { $0.title.lowercased().contains(query) }
-        let searchedGroupedByYear = Dictionary(grouping: searchedArray, by: \.year)
+    
+    func sortFirstFiveMovies(dict: Dictionary<Int, [MovieElement]>) -> [GroupedMovies] {
         
-        let newMoviesStruct = searchedGroupedByYear.map { (key: Int, value: [MovieElement]) -> GroupedMovies in
+        var finalResult = [GroupedMovies]()
+        
+        finalResult = dict.map { (key: Int, value: [MovieElement]) -> GroupedMovies in
             let sortedValueByRating = value.sorted { $0.rating > $1.rating }
             let firstFiveValues = Array(sortedValueByRating.prefix(5))
             return GroupedMovies(year: key, movies: firstFiveValues)
         }
         
-        let sortNewMoviesStruct = newMoviesStruct.sorted { $0.year < $1.year }
+        finalResult = finalResult.sorted { $0.year < $1.year }
         
-        
-        return sortNewMoviesStruct
+        return finalResult
     }
     
     

@@ -12,7 +12,7 @@ struct MovieDetailsView: View {
     
     var movie: MovieElement
     
-    @StateObject var viewModel = MovieDetailsViewModel(imageUseCase: ImagesUseCase())
+    @StateObject var viewModel = MovieDetailsViewModel()
     
     var body: some View {
         

@@ -19,9 +19,9 @@ class MovieDetailsViewModel: ObservableObject {
     
     var page = 1
     
-    var imageUseCase: AllImages
+    var imageUseCase: ImagesUseCaseProtocol
     
-    init(imageUseCase: AllImages) {
+    init(imageUseCase: ImagesUseCaseProtocol = ImagesUseCase()) {
         self.imageUseCase = imageUseCase
     }
     
@@ -43,7 +43,7 @@ class MovieDetailsViewModel: ObservableObject {
                 self.canPagination = !isLastPage
                 print(self.page)
             case .failure(let error):
-                self.alertItem = AlertItem(message: Text(error.errorObject.message), dismissButton: .default(Text("OK")), secondaryButton: nil)
+                self.alertItem = AlertItem(message: Text(error.errorDescription), dismissButton: .default(Text("OK")), secondaryButton: nil)
             }
         }
     }

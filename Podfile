@@ -8,3 +8,11 @@ pod 'Alamofire', '~> 5.2'
 pod 'Kingfisher'
 
 end
+
+
+target 'SWVL-TaskTests' do
+  use_frameworks!
+  
+  pod 'Alamofire', '~> 5.2'
+  
+end

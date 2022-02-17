@@ -1,15 +1,16 @@
 //
-//  LocalDataFetcher.swift
+//  LocalDataService.swift
 //  SWVL-Task
 //
-//  Created by Marwan Osama on 10/08/2021.
+//  Created by Marwan-Youxel on 10/02/2022.
 //
 
 import Foundation
 
-class LocalDataFetcher {
+class LocalDataService: LocalDataClient {
     
-    static func fetchData<T: Codable>(resource: DatabaseResource, responseModel: T.Type, completionHandler: @escaping(Result<T, DatabaseError>) -> Void) {
+    
+    func fetchData<T: Codable>(resource: DatabaseResource, responseModel: T.Type, completionHandler: @escaping (Result<T, DatabaseError>) -> Void) {
         
         if let url = Bundle.main.url(forResource: resource.rawValue, withExtension: "json") {
             do {
@@ -23,7 +24,11 @@ class LocalDataFetcher {
         } else {
             completionHandler(.failure(.pathError))
         }
-    
-    }
 
+        
+    }
+    
+    
+    
+    
 }

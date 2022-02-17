@@ -20,7 +20,7 @@ struct HomeView: View {
         UINavigationBar.appearance().scrollEdgeAppearance = navigationBarApperance
     }
     
-    @StateObject var viewModel = HomeViewModel(allMoviesUseCase: AllMoviesUseCase(), filteredMoviesUseCase: FilteredMoviesUseCase())
+    @StateObject var viewModel = HomeViewModel()
     @State var searchQuery = ""
     @State var isSearchActive = false
     @State var navBarButtonImageName = "magnifyingglass"

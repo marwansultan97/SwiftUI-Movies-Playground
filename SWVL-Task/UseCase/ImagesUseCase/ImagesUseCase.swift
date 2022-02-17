@@ -8,20 +8,22 @@
 import Foundation
 
 
-protocol AllImages {
+protocol ImagesUseCaseProtocol {
     // Boolean Value for pagination (is Last Page)
     func getImages(page: Int, tags: String, completion: @escaping(Result<([URL], Bool), NetworkError>) -> Void)
 }
 
-class ImagesUseCase: AllImages {
+class ImagesUseCase: ImagesUseCaseProtocol {
     
-    var repo = ImagesRepoImpl()
+    private var service: NetworkClient
     
+    init(service: NetworkClient = NetworkService()) {
+        self.service = service
+    }
     
     func getImages(page: Int, tags: String, completion: @escaping (Result<([URL], Bool), NetworkError>) -> Void) {
         
-        repo.getImages(page: page, tags: tags) { [weak self] response in
-            guard let self = self else { return }
+        service.request(model: Images.self, apiAction: .photos(page: page, tags: tags)) { response in
             switch response {
             case .success(let images):
                 images.photos.page < images.photos.pages ? completion(.success((self.convertToUrl(images: images.photos.photo), false))) : completion(.success((self.convertToUrl(images: images.photos.photo), true)))
@@ -30,6 +32,9 @@ class ImagesUseCase: AllImages {
             }
         }
     }
+    
+    
+    
     
     
     private func convertToUrl(images: [Photo]) -> [URL] {

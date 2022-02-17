@@ -15,17 +15,18 @@ class HomeViewModel: ObservableObject {
     @Published var alertItem: AlertItem?
     @Published var searchedMovies = [GroupedMovies]()
     
-    var filteredMoviesUseCase: FilteredMovies
-    var allMoviesUseCase: AllMovies
+    private var filteredMoviesUseCase: FilteredMoviesProtocol
+    private var moviesUseCase: MoviesUseCaseProtocol
     
-    init(allMoviesUseCase: AllMovies, filteredMoviesUseCase: FilteredMovies) {
-        self.allMoviesUseCase = allMoviesUseCase
+    init(moviesUseCase: MoviesUseCaseProtocol = MoviesUseCase(),
+         filteredMoviesUseCase: FilteredMoviesProtocol = FilteredMoviesUseCase()) {
+        self.moviesUseCase = moviesUseCase
         self.filteredMoviesUseCase = filteredMoviesUseCase
     }
     
     func getMovies() {
         isLoading = true
-        allMoviesUseCase.getMovies { [weak self] response in
+        moviesUseCase.getMovies { [weak self] response in
             guard let self = self else { return }
             self.isLoading = false
             switch response {
@@ -39,15 +40,8 @@ class HomeViewModel: ObservableObject {
     
     func getFilteredMovies(query: String) {
         isLoading = true
-        filteredMoviesUseCase.filterMovies(query: query) { [weak self] response in
-            self?.isLoading = false
-            switch response {
-            case .success(let movies):
-                    self?.searchedMovies = movies
-            case .failure(let error):
-                self?.alertItem = AlertItem(title: Text("Error"), message: Text(error.description), dismissButton: .default(Text("OK")), secondaryButton: nil)
-            }
-        }
+        searchedMovies = filteredMoviesUseCase.filterMovies(movies: movies, query: query)
+        isLoading = false
     }
     
 }

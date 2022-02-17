@@ -10,4 +10,5 @@ import Foundation
 
 enum DatabaseResource: String {
     case movies = "movies"
+    case mock = "mock"
 }

@@ -1,5 +1,5 @@
 //
-//  AllMoviesUseCase.swift
+//  MoviesUseCase.swift
 //  SWVL-Task
 //
 //  Created by Marwan Osama on 11/08/2021.
@@ -7,20 +7,24 @@
 
 import Foundation
 
-typealias allMoviesResult = (Result<[MovieElement], DatabaseError>) -> Void
 
-protocol AllMovies {
+protocol MoviesUseCaseProtocol {
     
     func getMovies(completionHandler: @escaping (Result<[MovieElement], DatabaseError>) -> Void)
         
 }
 
-class AllMoviesUseCase: AllMovies {
+class MoviesUseCase: MoviesUseCaseProtocol {
     
-    private var repo = MoviesRepoImpl()
+    private var client: LocalDataClient
+    
+    init(client: LocalDataClient = LocalDataService()) {
+        self.client = client
+    }
     
     func getMovies(completionHandler: @escaping (Result<[MovieElement], DatabaseError>) -> Void) {
-        repo.getMovies { response in
+
+        client.fetchData(resource: .movies, responseModel: Movies.self) { response in
             switch response {
             case .success(let movies):
                 completionHandler(.success(movies.movies))
@@ -28,6 +32,7 @@ class AllMoviesUseCase: AllMovies {
                 completionHandler(.failure(error))
             }
         }
+        
     }
 
     
